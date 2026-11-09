@@ -1,100 +1,114 @@
-/* =================================
-   NOVAMESH AI
-   MAIN JAVASCRIPT
-   Version 0.1.0
-================================= */
+// NovaMesh AI - Frontend API connection
+
+const API_BASE_URL = "https://YOUR-SERVICE.onrender.com";
 
 let currentMode = "text";
 
-// MODE SELECTOR
-function setMode(mode) {
-  currentMode = mode;
+function showMessage(message) {
+    let output = document.getElementById("generationStatus");
 
-  const imageInput = document.getElementById("image");
-  const promptInput = document.getElementById("prompt");
-  const status = document.getElementById("status");
+    if (!output) {
+        output = document.createElement("p");
+        output.id = "generationStatus";
 
-  if (mode === "text") {
-    imageInput.style.display = "none";
-    promptInput.placeholder =
-      "Describe your 3D model...";
-    status.textContent =
-      "Text to 3D mode selected.";
-  }
+        const button = document.querySelector(
+            'button[onclick="generateModel()"]'
+        );
 
-  if (mode === "image") {
-    imageInput.style.display = "block";
-    promptInput.placeholder =
-      "Add optional instructions for your image...";
-    status.textContent =
-      "Image to 3D mode selected.";
-  }
-}
-
-// GENERATE MODEL
-async function generateModel() {
-  const prompt =
-    document.getElementById("prompt").value.trim();
-
-  const image =
-    document.getElementById("image").files[0];
-
-  const style =
-    document.getElementById("style").value;
-
-  const status =
-    document.getElementById("status");
-
-  const button =
-    document.querySelector(".generate");
-
-  if (currentMode === "text" && !prompt) {
-    status.textContent =
-      "Please enter a model description.";
-    return;
-  }
-
-  if (currentMode === "image" && !image) {
-    status.textContent =
-      "Please select an image first.";
-    return;
-  }
-
-  button.disabled = true;
-  button.textContent = "Preparing request...";
-
-  status.textContent =
-    "Your request is ready. AI service is not connected yet.";
-
-  const request = {
-    mode: currentMode,
-    prompt: prompt,
-    style: style,
-    image: image ? image.name : null
-  };
-
-  console.log("AI3D Studio request:", request);
-
-  button.disabled = false;
-  button.textContent = "✦ Generate 3D";
-}
-
-// INITIALIZATION
-document.addEventListener("DOMContentLoaded", () => {
-  const imageInput =
-    document.getElementById("image");
-
-  imageInput.style.display = "none";
-
-  imageInput.addEventListener("change", () => {
-    const file = imageInput.files[0];
-
-    if (file) {
-      document.getElementById("status").textContent =
-        "Selected image: " + file.name;
+        if (button) {
+            button.insertAdjacentElement("afterend", output);
+        } else {
+            document.body.appendChild(output);
+        }
     }
-  });
 
-  console.log("AI3D Studio initialized.");
+    output.textContent = message;
+}
+
+function setMode(mode) {
+    currentMode = mode;
+
+    const imageInput = document.getElementById("image");
+
+    if (imageInput) {
+        imageInput.style.display =
+            mode === "image" ? "block" : "none";
+    }
+
+    showMessage(
+        mode === "image"
+            ? "Image to 3D mode selected."
+            : "Text to 3D mode selected."
+    );
+}
+
+async function generateModel() {
+    const prompt = document.getElementById("prompt");
+    const style = document.getElementById("style");
+    const image = document.getElementById("image");
+
+    try {
+        showMessage("Connecting to NovaMesh AI backend...");
+
+        let response;
+
+        if (currentMode === "image") {
+            if (!image || !image.files.length) {
+                showMessage("Please select an image first.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", image.files[0]);
+
+            response = await fetch(
+                `${API_BASE_URL}/api/generate/image`,
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+        } else {
+            if (!prompt || !prompt.value.trim()) {
+                showMessage("Please enter a 3D model description.");
+                return;
+            }
+
+            response = await fetch(
+                `${API_BASE_URL}/api/generate/text`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        prompt: prompt.value,
+                        style: style ? style.value : "Realistic",
+                        quality: "Standard"
+                    })
+                }
+            );
+        }
+
+        const result = await response.json();
+
+        if (result.status === "not_configured") {
+            showMessage(
+                "Backend connected. AI generation model is not installed yet."
+            );
+        } else if (!response.ok) {
+            showMessage("Server error: " + response.status);
+        } else {
+            showMessage(result.message || "Request completed.");
+        }
+
+    } catch (error) {
+        showMessage(
+            "Cannot connect to backend. Check the API address and deployment."
+        );
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    setMode("text");
 });
-    
