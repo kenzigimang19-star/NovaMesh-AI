@@ -4,8 +4,8 @@ from pydantic import BaseModel
 from datetime import datetime, timezone
 
 app = FastAPI(
-    title="AI3D Studio API",
-    description="Backend API for AI3D Studio",
+    title="NovaMesh AI API",
+    description="Backend API for NovaMesh AI",
     version="0.1.0"
 )
 
@@ -29,7 +29,7 @@ class TextGenerationRequest(BaseModel):
 @app.get("/")
 def home():
     return {
-        "name": "AI3D Studio API",
+        "name": "NovaMesh AI API",
         "version": "0.1.0",
         "status": "online"
     }
@@ -80,4 +80,4 @@ async def generate_image(file: UploadFile = File(...)):
         "message": "Image-to-3D generation is not connected yet.",
         "filename": file.filename,
         "content_type": file.content_type
-}
+    }
