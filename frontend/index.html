@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI3D Studio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h2>◆ AI3D STUDIO</h2>
+    <nav>
+      <a href="#create">Create</a>
+      <a href="#assets">My Assets</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Ubah Ide Menjadi <span>3D.</span></h1>
+      <p>Buat model 3D menggunakan kecerdasan buatan.</p>
+    </section>
+
+    <section class="workspace" id="create">
+      <div class="panel">
+        <h2>Create 3D Model</h2>
+
+        <div class="tabs">
+          <button onclick="setMode('text')">Text to 3D</button>
+          <button onclick="setMode('image')">Image to 3D</button>
+        </div>
+
+        <textarea id="prompt"
+          placeholder="Deskripsikan model 3D yang ingin dibuat..."></textarea>
+
+        <input type="file" id="image" accept="image/*">
+
+        <label>Model Style</label>
+        <select id="style">
+          <option>Realistic</option>
+          <option>Stylized</option>
+          <option>Low Poly</option>
+          <option>Game Ready</option>
+        </select>
+
+        <button class="generate" onclick="generateModel()">
+          ✦ Generate 3D
+        </button>
+
+        <p id="status">AI Generator belum dihubungkan.</p>
+      </div>
+
+      <div class="panel preview">
+        <h2>3D Preview</h2>
+        <div class="viewport">
+          <div class="cube">3D</div>
+          <p>Model akan tampil di sini.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="assets">
+      <h2>My Assets</h2>
+      <p>Model 3D buatanmu akan disimpan di sini.</p>
+    </section>
+  </main>
+
+  <footer>
+    AI3D Studio © 2026
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
